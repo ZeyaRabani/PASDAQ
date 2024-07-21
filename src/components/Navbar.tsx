@@ -81,7 +81,7 @@ export default function Navbar() {
                             </span>
                         </Link>
 
-                        <Link href='/portfolio' passHref>
+                        {/* <Link href='/portfolio' passHref>
                             <span
                                 ref={(el) => {
                                     linkRefs.current['/portfolio'] = el;
@@ -91,7 +91,7 @@ export default function Navbar() {
                             >
                                 Portfolio
                             </span>
-                        </Link>
+                        </Link> */}
 
                     </div>
                 </div>

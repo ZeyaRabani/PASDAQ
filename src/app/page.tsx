@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { Spotlight } from '@/components/ui/spotlight'
 import { Button } from '@/components/ui/button'
@@ -73,6 +73,74 @@ const FeatureCard: React.FC<Feature> = ({ logo, title, description }) => (
 );
 
 export default function Page() {
+  const [totalSum, setTotalSum] = useState<number>(0);
+  const [totalSum50, setTotalSum50] = useState<number>(0);
+  const [totalSum100, setTotalSum100] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchCoinMarketCapData = async () => {
+      try {
+        const response = await fetch('/coinmarketcap');
+        const responseData = await response.json();
+        // console.log(responseData);
+
+        if (!responseData.data || !Array.isArray(responseData.data)) {
+          throw new Error('Data is not an array');
+        }
+
+        const prices = responseData.data.reduce((sum: number, coin: any) => sum + (coin.quote.USD.price || 0), 0);
+        // console.log(prices);
+
+        setTotalSum(prices / responseData.data.length);
+      } catch (error) {
+        // console.log(error);
+      }
+    };
+
+    const fetchCoinMarketCapData50 = async () => {
+      try {
+        const response = await fetch('/coinmarketcap50');
+        const responseData = await response.json();
+        // console.log(responseData);
+
+        if (!responseData.data || !Array.isArray(responseData.data)) {
+          throw new Error('Data is not an array');
+        }
+
+        const prices = responseData.data.reduce((sum: number, coin: any) => sum + (coin.quote.USD.price || 0), 0);
+        // console.log(prices);
+
+        setTotalSum50(prices / responseData.data.length);
+      } catch (error) {
+        // console.log(error);
+      }
+    };
+
+    const fetchCoinMarketCapData100 = async () => {
+      try {
+        const response = await fetch('/coinmarketcap100');
+        const responseData = await response.json();
+        // console.log(responseData);
+
+        if (!responseData.data || !Array.isArray(responseData.data)) {
+          throw new Error('Data is not an array');
+        }
+
+        const prices = responseData.data.reduce((sum: number, coin: any) => sum + (coin.quote.USD.price || 0), 0);
+        // console.log(prices);
+
+        setTotalSum100(prices / responseData.data.length);
+      } catch (error) {
+        // console.log(error);
+      }
+    };
+
+    // fetchCoinbaseData();
+    fetchCoinMarketCapData();
+    fetchCoinMarketCapData50();
+    fetchCoinMarketCapData100();
+  }, []);
+
   return (
     <div>
       <div className='md:h-[30rem] w-full flex md:items-center md:justify-center antialiased bg-grid-white/[0.02] relative overflow-hidden'>
@@ -103,8 +171,21 @@ export default function Page() {
       </div>
 
       <MaxWidthWrapper>
-        <div className='flex flex-col overflow-hidden'>
-          <ContainerScroll
+        <div className='flex flex-col space-y-4 items-center justify-center overflow-hidden'>
+          <h1 className='text-6xl font-semibold'>Price of PANDAQ Index Fund</h1>
+          <div className='text-2xl'>
+            P10: ${totalSum.toFixed(4)}
+          </div>
+          <p>P10 Index Fund consists of the top 10 cryptocurrencies.</p>
+          <div className='text-2xl'>
+            P50: ${totalSum50.toFixed(4)}
+          </div>
+          <p>P50 Index Fund consists of the top 50 cryptocurrencies.</p>
+          <div className='text-2xl'>
+            P100: ${totalSum100.toFixed(4)}
+          </div>
+          <p>P100 Index Fund consists of the top 100 cryptocurrencies.</p>
+          {/* <ContainerScroll
             titleComponent={
               <>
                 <h1 className='text-4xl font-semibold text-black dark:text-white'>
@@ -123,7 +204,7 @@ export default function Page() {
               className="mx-auto rounded-2xl object-cover h-full object-left-top"
               draggable={false}
             />
-          </ContainerScroll>
+          </ContainerScroll> */}
         </div>
 
         <div>

@@ -1,7 +1,7 @@
 export async function GET() {
     const coinmarket_cap_key = process.env.COINMARKETCAP_API_KEY;
 
-    const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=1&limit=10&CMC_PRO_API_KEY=${coinmarket_cap_key}`;
+    const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=1&limit=100&CMC_PRO_API_KEY=${coinmarket_cap_key}`;
 
     try {
         const res = await fetch(url)

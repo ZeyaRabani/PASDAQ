@@ -51,7 +51,7 @@ export default function Swap() {
 
     const fetchBTCPrice = async () => {
         try {
-            const response = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/buy');
+            const response = await fetch('https://api.coinbase.com/v2/prices/DOT-USD/buy');
             const data: BTCnSTXPriceResponse = await response.json();
             setbtcAmount(data.data.amount);
         } catch (error) {
@@ -71,54 +71,60 @@ export default function Swap() {
     }, []);
 
     useEffect(() => {
-        const fetchCoinbaseData = async () => {
-            const assets = ['STX', 'MAPO', 'ICP', 'RIF'];
-            try {
-                const coinbaseRequests = assets.map(async (asset) => {
-                    const response = await fetch(`https://api.coinbase.com/v2/prices/${asset}-USD/buy`);
-                    const data = await response.json();
-                    return parseFloat(data.data.amount);
-                });
-                const result = await Promise.all(coinbaseRequests);
-                setCoinbaseData(result);
-            } catch (error) {
-                toast.error('Error fetching P10price. Please try again!');
-            }
-        };
+        // const fetchCoinbaseData = async () => {
+        //     const assets = ['STX', 'MAPO', 'ICP', 'RIF'];
+        //     try {
+        //         const coinbaseRequests = assets.map(async (asset) => {
+        //             const response = await fetch(`https://api.coinbase.com/v2/prices/${asset}-USD/buy`);
+        //             const data = await response.json();
+        //             return parseFloat(data.data.amount);
+        //         });
+        //         const result = await Promise.all(coinbaseRequests);
+        //         setCoinbaseData(result);
+        //     } catch (error) {
+        //         toast.error('Error fetching P10price. Please try again!');
+        //     }
+        // };
 
         const fetchCoinMarketCapData = async () => {
             try {
-                const response = await fetch('/coinmarketcap')
-                const data = await response.json();
+                const response = await fetch('/coinmarketcap');
+                const responseData = await response.json();
+                // console.log(responseData);
 
-                const prices = [
-                    data.data.CFX[0].quote.USD.price,
-                    data.data.SOV[0].quote.USD.price
-                ];
+                if (!responseData.data || !Array.isArray(responseData.data)) {
+                    throw new Error('Data is not an array');
+                }
+
+                const prices = responseData.data.reduce((sum: number, coin: any) => sum + (coin.quote.USD.price || 0), 0);
+                // console.log(prices);
 
                 setCoinMarketCapData(prices);
+                setTotalSum(prices / responseData.data.length);
             } catch (error) {
+                // console.log(error);
                 toast.error('Error fetching P10price. Please try again!');
             }
         };
 
-        fetchCoinbaseData();
+        // fetchCoinbaseData();
         fetchCoinMarketCapData();
+        setLoading(false);
     }, []);
 
-    useEffect(() => {
-        if (coinbaseData.length > 0 && coinMarketCapData.length > 0) {
-            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0) + coinMarketCapData.reduce((acc, curr) => acc + curr, 0);
-            const bit10DeFi = sum / 6;
-            setTotalSum(bit10DeFi);
-        } else {
-            const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0);
-            const bit10DeFi = sum / 4;
-            setTotalSum(bit10DeFi);
-        }
-        setLoading(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [coinbaseData, coinMarketCapData]);
+    // useEffect(() => {
+    //     if (coinbaseData.length > 0 && coinMarketCapData.length > 0) {
+    //         const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0) + coinMarketCapData.reduce((acc, curr) => acc + curr, 0);
+    //         const bit10DeFi = sum / 6;
+    //         setTotalSum(bit10DeFi);
+    //     } else {
+    //         const sum = coinbaseData.reduce((acc, curr) => acc + curr, 0);
+    //         const bit10DeFi = sum / 4;
+    //         setTotalSum(bit10DeFi);
+    //     }
+    //     setLoading(false);
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [coinbaseData, coinMarketCapData]);
 
     const refreshData = () => {
         fetchBTCPrice();
@@ -187,23 +193,23 @@ export default function Swap() {
                                         <p>Pay with</p>
                                         <div className='grid md:grid-cols-2 gap-y-2 md:gap-x-2 items-center justify-center py-2 w-full'>
                                             <div className='text-4xl text-center md:text-start'>
-                                                {((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)).toFixed(6)}
+                                                {((parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))) / parseFloat(btcAmount)).toFixed(4)}
                                             </div>
                                             <div className='flex flex-row items-center'>
                                                 <div className='py-1 px-2 mr-6 border-2 rounded-l-full z-10 w-full'>
                                                     <div className='pl-4 py-1'>
-                                                        BTC
+                                                        DOT
                                                     </div>
                                                 </div>
                                                 <div className='-ml-12 z-20'>
-                                                    <Image src='/swap/bitcoin.svg' alt='BTC' width={75} height={75} className='z-20 bg-white rounded-full' />
+                                                    <Image src='/swap/polkadot.svg' alt='BTC' width={75} height={75} className='z-20 bg-white rounded-full p-1' />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
                                             <div>$ {(parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))).toFixed(4)}</div>
                                             <div>
-                                                1 BTC = $ {parseFloat(btcAmount).toLocaleString(undefined, { minimumFractionDigits: 3 })}
+                                                1 DOT = $ {parseFloat(btcAmount).toLocaleString(undefined, { minimumFractionDigits: 3 })}
                                             </div>
                                         </div>
                                     </div>
@@ -243,7 +249,7 @@ export default function Swap() {
                                                     </div>
                                                 </div>
                                                 <div className='-ml-12 z-20'>
-                                                    <Image src='/swap/bit10.svg' alt='bit10' width={75} height={75} className='z-20' />
+                                                    <Image src='/swap/polkadot.svg' alt='bit10' width={75} height={75} className='z-20 bg-white rounded-full p-1' />
                                                 </div>
                                             </div>
                                         </div>

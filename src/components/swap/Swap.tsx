@@ -144,6 +144,7 @@ export default function Swap() {
         try {
             // setSwaping(true);
             console.log(values);
+            toast.error('You don\'t have enough DOT to swap. Please try again!');
         } catch (error) {
             setSwaping(false);
             toast.error('An error occurred while processing your request. Please try again!');
@@ -256,7 +257,7 @@ export default function Swap() {
                                         <div className='hidden md:flex flex-col md:flex-row items-center justify-between space-y-2 space-x-0 md:space-y-0 md:space-x-2 text-sm pr-2'>
                                             <div>$ {(parseInt(form.watch('bit10_amount')) * parseFloat(totalSum.toFixed(4))).toFixed(4)}</div>
                                             <div>
-                                                1 BIT10.DEFI = $ {totalSum?.toFixed(4)}
+                                                1 P10 = $ {totalSum?.toFixed(4)}
                                             </div>
                                         </div>
                                     </div>
